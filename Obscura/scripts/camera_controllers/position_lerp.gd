@@ -29,20 +29,25 @@ func _process(delta: float) -> void:
 	var tpos = target.global_position
 	var dist_pos = global_position - tpos
 	var distance = sqrt(dist_pos.x * dist_pos.x + dist_pos.z * dist_pos.z)
+	print(distance)
 	
 	if distance < 0.5:
+		# Very close to origin, snap camera to target
 		global_position.x = tpos.x
 		global_position.z = tpos.z
 	elif distance != 0:
 		if distance > leash_distance:
+			# Stop camera from getting too far from player
 			global_position.x += target.velocity.x * delta
 			global_position.z += target.velocity.z * delta
 		else:
+			# Distance = speed * time, use of follow and catchup speed as a ratio
 			var camera_follow_dist = follow_speed * _target_speed * delta
 			var camera_catchup_dist = catchup_speed * _target_speed * delta
 			var target_velocity = target.velocity
 			# Follow target
 			if target_velocity != Vector3(0, 0, 0):
+				# Check target's direction and camera's proximity to it
 				if target_velocity.x > 0 && global_position.x < tpos.x:
 					global_position.x += camera_follow_dist
 				elif target_velocity.x < 0 && tpos.x < global_position.x:
@@ -54,6 +59,7 @@ func _process(delta: float) -> void:
 					global_position.z += camera_follow_dist
 			# Catchup to target
 			elif target_velocity == Vector3(0, 0, 0) && tpos != global_position:
+				# Check where camera has to catchip to
 				if global_position.x < tpos.x:
 					global_position.x += camera_catchup_dist
 				elif tpos.x < global_position.x:

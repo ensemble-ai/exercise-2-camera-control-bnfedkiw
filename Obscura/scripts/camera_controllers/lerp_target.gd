@@ -1,14 +1,18 @@
-class_name PositionLerp
+class_name TargetLerp
 extends CameraControllerBase
 
+const SPEED_UP_CAMERA:float = 1.5
 
 # Make speeds be a ratio of player speed
-@export var follow_speed:float = 0.30
-@export var catchup_speed:float = 0.50
-@export var leash_distance:float = 7.0
+# Add 1 to lead speed to make it faster than the player
+@export var lead_speed:float = 1.60
+@export var catchup_delay_duration:float = 0.5
+@export var catchup_speed:float = 0.7
+@export var leash_distance:float = 6.0
 
 var _target_speed:float = target.BASE_SPEED
-var _origin_tolerance:float = catchup_speed
+var _origin_tolerance:float = lead_speed - 1
+var _timer:Timer
 
 
 func _ready() -> void:
@@ -34,45 +38,66 @@ func _process(delta: float) -> void:
 	var dist_pos = global_position - tpos
 	var distance = sqrt(dist_pos.x * dist_pos.x + dist_pos.z * dist_pos.z)
 	var target_velocity = target.velocity
-	
+
 	# If very close to origin and target is not moving, snap camera to target
 	if distance < _origin_tolerance && target_velocity == Vector3(0, 0, 0):
 		global_position.x = tpos.x
 		global_position.z = tpos.z
-	elif distance != 0:
+		_timer = null
+	if distance != 0:
 		if distance > leash_distance:
 			# Stop camera from getting too far from player
-			global_position.x += target.velocity.x * delta
-			global_position.z += target.velocity.z * delta
+			# If camera is behind player, speed it up to get ahead
+			if target_velocity.x > 0 && global_position.x < tpos.x \
+			|| target_velocity.x < 0 && tpos.x < global_position.x:
+				_timer = null
+				global_position.x += SPEED_UP_CAMERA * target.velocity.x * delta
+			else:
+				# If camera is ahead, don't let it get farther
+				global_position.x += target.velocity.x * delta
+				
+			if target_velocity.z < 0 && global_position.z > tpos.z \
+			|| target_velocity.z > 0 && tpos.z > global_position.z:
+				_timer = null
+				global_position.z += SPEED_UP_CAMERA * target.velocity.z * delta
+			else:
+				global_position.z += target.velocity.z * delta
 		else:
+			# Distance = speed * time, use of follow and catchup speed as a ratio
+			var camera_lead_dist = lead_speed * _target_speed * delta
 			# Follow target
 			if target_velocity != Vector3(0, 0, 0):
-				# Distance = speed * time
-				var camera_follow_dist = follow_speed * _target_speed * delta
 				# Check target's direction and camera's proximity to it
-				if target_velocity.x > 0 && global_position.x < tpos.x:
-					global_position.x += camera_follow_dist
-				elif target_velocity.x < 0 && tpos.x < global_position.x:
-					global_position.x -= camera_follow_dist
+				if target_velocity.x > 0:
+					global_position.x += camera_lead_dist
+				elif target_velocity.x < 0:
+					global_position.x -= camera_lead_dist
 					
-				if target_velocity.z < 0 && global_position.z > tpos.z:
-					global_position.z -= camera_follow_dist
-				elif target_velocity.z > 0 && tpos.z > global_position.z:
-					global_position.z += camera_follow_dist
+				if target_velocity.z < 0:
+					global_position.z -= camera_lead_dist
+				elif target_velocity.z > 0:
+					global_position.z += camera_lead_dist
 					
 		# Catchup to target
 		if target_velocity == Vector3(0, 0, 0) && tpos != global_position:
 			var camera_catchup_dist = catchup_speed * _target_speed * delta
-			# Check where camera has to catchip to
-			if global_position.x < tpos.x:
-				global_position.x += camera_catchup_dist
-			elif tpos.x < global_position.x:
-				global_position.x -= camera_catchup_dist
-				
-			if global_position.z < tpos.z:
-				global_position.z += camera_catchup_dist
-			elif tpos.z < global_position.z:
-				global_position.z -= camera_catchup_dist
+			if _timer == null:
+				_timer = Timer.new()
+				self.add_child(_timer)
+				_timer.one_shot = true
+				_timer.start(catchup_delay_duration)
+			
+			if _timer.is_stopped():
+				# Check where camera has to catchip to
+				if global_position.x < tpos.x:
+					global_position.x += camera_catchup_dist
+				elif tpos.x < global_position.x:
+					global_position.x -= camera_catchup_dist
+					
+				if global_position.z < tpos.z:
+					global_position.z += camera_catchup_dist
+				elif tpos.z < global_position.z:
+					global_position.z -= camera_catchup_dist	
 	super(delta)
 	
 

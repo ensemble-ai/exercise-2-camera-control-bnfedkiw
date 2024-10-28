@@ -14,11 +14,13 @@ func _ready():
 
 
 func _process(_delta):
-	
+
 	if Input.is_action_just_pressed("cycle_camera_controller"):
 		current_controller += 1
 		if len(cameras) < current_controller+1:
 			current_controller = 0
+			
+		cameras[current_controller].draw_camera_logic = true
 		
 		for index in len(cameras):
 			if null != cameras[index]:
@@ -34,6 +36,5 @@ func _process(_delta):
 					current_controller = index
 					cameras[current_controller].make_current()
 					
-			
 		
 	

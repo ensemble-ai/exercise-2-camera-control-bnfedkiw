@@ -2,13 +2,11 @@ class_name PositionLock
 extends CameraControllerBase
 
 
-# Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	super()
 	draw_camera_logic = true
 
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	if !current:
 		return

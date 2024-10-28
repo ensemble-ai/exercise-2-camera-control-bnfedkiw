@@ -4,16 +4,14 @@ extends CameraControllerBase
 
 @export var top_left:Vector2 = Vector2(-12, 6)
 @export var bottom_right:Vector2 = Vector2(12, -6)
-@export var autoscroll_speed:Vector3 = Vector3(1.0, 0, 0)
+@export var autoscroll_speed:Vector3 = Vector3(20.0, 0, 0)
 
 
-# Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	draw_camera_logic = true
 	super()
 
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	if !current:
 		return
@@ -22,10 +20,10 @@ func _process(delta: float) -> void:
 		draw_logic()
 		
 	# autoscroll camera + player
-	global_position.x += autoscroll_speed.x
-	global_position.z += autoscroll_speed.z
-	target.global_position.x += autoscroll_speed.x
-	target.global_position.z += autoscroll_speed.z
+	global_position.x += autoscroll_speed.x * delta
+	global_position.z += autoscroll_speed.z * delta
+	target.global_position.x += autoscroll_speed.x * delta
+	target.global_position.z += autoscroll_speed.z * delta
 	
 	var tpos = target.global_position
 	var cpos = global_position

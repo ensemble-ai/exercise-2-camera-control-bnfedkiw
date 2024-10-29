@@ -6,7 +6,7 @@ const SPEED_UP_CAMERA:float = 1.5
 # Make speeds be a ratio of player speed
 # Add 1 to lead speed to make it faster than the player
 @export var lead_speed:float = 1.60
-@export var catchup_delay_duration:float = 0.5
+@export var catchup_delay_duration:float = 1.0
 @export var catchup_speed:float = 0.7
 @export var leash_distance:float = 6.0
 
@@ -43,6 +43,7 @@ func _process(delta: float) -> void:
 	if distance < _origin_tolerance && target_velocity == Vector3(0, 0, 0):
 		global_position.x = tpos.x
 		global_position.z = tpos.z
+		distance = 0
 		_timer = null
 	if distance != 0:
 		if distance > leash_distance:
@@ -79,16 +80,15 @@ func _process(delta: float) -> void:
 					global_position.z += camera_lead_dist
 					
 		# Catchup to target
-		if target_velocity == Vector3(0, 0, 0) && tpos != global_position:
-			var camera_catchup_dist = catchup_speed * _target_speed * delta
+		if target.velocity == Vector3(0, 0, 0):
 			if _timer == null:
 				_timer = Timer.new()
-				self.add_child(_timer)
+				add_child(_timer)
 				_timer.one_shot = true
 				_timer.start(catchup_delay_duration)
-			
-			if _timer.is_stopped():
-				# Check where camera has to catchip to
+			elif _timer.is_stopped():
+				var camera_catchup_dist = catchup_speed * _target_speed * delta
+				# Check where camera has to catchup to
 				if global_position.x < tpos.x:
 					global_position.x += camera_catchup_dist
 				elif tpos.x < global_position.x:
@@ -97,7 +97,7 @@ func _process(delta: float) -> void:
 				if global_position.z < tpos.z:
 					global_position.z += camera_catchup_dist
 				elif tpos.z < global_position.z:
-					global_position.z -= camera_catchup_dist	
+					global_position.z -= camera_catchup_dist
 	super(delta)
 	
 

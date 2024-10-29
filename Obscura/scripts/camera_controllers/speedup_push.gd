@@ -1,7 +1,7 @@
 class_name SpeedupPush
 extends CameraControllerBase
 
-@export var push_ratio:float = 0.7
+@export var push_ratio:float = 0.4
 @export var pushbox_top_left:Vector2 = Vector2(-10, 7)
 @export var pushbox_bottom_right:Vector2 = Vector2(10, -7)
 @export var speedup_zone_top_left:Vector2 = Vector2(-4, 3)

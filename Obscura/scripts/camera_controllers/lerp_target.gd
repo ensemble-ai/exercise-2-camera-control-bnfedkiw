@@ -1,17 +1,17 @@
-class_name TargetLerp
+class_name LerpTarget
 extends CameraControllerBase
+
 
 const SPEED_UP_CAMERA:float = 1.5
 
 # Make speeds be a ratio of player speed
-# Add 1 to lead speed to make it faster than the player
-@export var lead_speed:float = 1.60
+@export var lead_speed:float = 0.60
 @export var catchup_delay_duration:float = 0.7
 @export var catchup_speed:float = 0.7
 @export var leash_distance:float = 6.0
 
 var _target_speed:float = target.BASE_SPEED
-var _origin_tolerance:float = lead_speed - 1
+var _origin_tolerance:float = lead_speed
 var _timer:Timer
 
 
@@ -21,7 +21,7 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
-	if !current:
+	if not current:
 		return
 	
 	if draw_camera_logic:
@@ -34,13 +34,13 @@ func _process(delta: float) -> void:
 		_target_speed = target.BASE_SPEED
 	
 	# Find distance between target and camera
-	var tpos = target.global_position
-	var dist_pos = global_position - tpos
-	var distance = sqrt(dist_pos.x * dist_pos.x + dist_pos.z * dist_pos.z)
-	var target_velocity = target.velocity
+	var tpos := target.global_position
+	var dist_pos := global_position - tpos
+	var distance := sqrt(dist_pos.x * dist_pos.x + dist_pos.z * dist_pos.z)
+	var target_velocity := target.velocity
 
 	# If very close to origin and target is not moving, snap camera to target
-	if distance < _origin_tolerance && target_velocity == Vector3(0, 0, 0):
+	if distance < _origin_tolerance and target_velocity == Vector3(0, 0, 0):
 		global_position.x = tpos.x
 		global_position.z = tpos.z
 		distance = 0
@@ -49,24 +49,29 @@ func _process(delta: float) -> void:
 		if distance > leash_distance:
 			# Stop camera from getting too far from player
 			# If camera is behind player, speed it up to get ahead
-			if target_velocity.x > 0 && global_position.x < tpos.x \
-			|| target_velocity.x < 0 && tpos.x < global_position.x:
+			if (
+					(target_velocity.x > 0 and global_position.x < tpos.x)
+					or (target_velocity.x < 0 and tpos.x < global_position.x)
+			):
 				_timer = null
 				global_position.x += SPEED_UP_CAMERA * target.velocity.x * delta
 			else:
 				# If camera is ahead, don't let it get farther
 				global_position.x += target.velocity.x * delta
 				
-			if target_velocity.z < 0 && global_position.z > tpos.z \
-			|| target_velocity.z > 0 && tpos.z > global_position.z:
+			if (
+					(target_velocity.z < 0 and global_position.z > tpos.z) 
+					or (target_velocity.z > 0 and tpos.z > global_position.z)
+			):
 				_timer = null
 				global_position.z += SPEED_UP_CAMERA * target.velocity.z * delta
 			else:
 				global_position.z += target.velocity.z * delta
 		else:
 			# Follow target
+			# Add 1 to lead speed to make it faster than the player
+			var camera_lead_dist := (lead_speed + 1.0) * _target_speed * delta
 			# Check target's direction and camera's proximity to it
-			var camera_lead_dist = lead_speed * _target_speed * delta
 			if target_velocity != Vector3(0, 0, 0):
 				if target_velocity.x > 0:
 					global_position.x += camera_lead_dist
@@ -87,7 +92,7 @@ func _process(delta: float) -> void:
 				_timer.start(catchup_delay_duration)
 			
 			if _timer.is_stopped():
-				var camera_catchup_dist = catchup_speed * _target_speed * delta
+				var camera_catchup_dist := catchup_speed * _target_speed * delta
 				# Check where camera has to catchup to
 				if global_position.x < tpos.x:
 					global_position.x += camera_catchup_dist
@@ -102,7 +107,10 @@ func _process(delta: float) -> void:
 	# If catchup is in progress, see if target started moving before it finished
 	# If target is moving, reset timer
 	if _timer != null:
-		if _timer.is_stopped() && (target.velocity.x != 0 || target.velocity.z != 0):
+		if (
+				_timer.is_stopped() 
+				and (target.velocity.x != 0 or target.velocity.z != 0)
+		):
 			_timer = null
 			
 	super(delta)
@@ -136,6 +144,6 @@ func draw_logic() -> void:
 	mesh_instance.global_transform = Transform3D.IDENTITY
 	mesh_instance.global_position = Vector3(global_position.x, target.global_position.y, global_position.z)
 	
-	#mesh is freed after one update of _process
+	# Mesh is freed after one update of _process
 	await get_tree().process_frame
 	mesh_instance.queue_free()

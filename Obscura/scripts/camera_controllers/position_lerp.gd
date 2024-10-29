@@ -17,7 +17,7 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
-	if !current:
+	if not current:
 		return
 	
 	if draw_camera_logic:
@@ -30,13 +30,13 @@ func _process(delta: float) -> void:
 		_target_speed = target.BASE_SPEED
 	
 	# Find distance between target and camera
-	var tpos = target.global_position
-	var dist_pos = global_position - tpos
-	var distance = sqrt(dist_pos.x * dist_pos.x + dist_pos.z * dist_pos.z)
-	var target_velocity = target.velocity
+	var tpos := target.global_position
+	var dist_pos := global_position - tpos
+	var distance := sqrt(dist_pos.x * dist_pos.x + dist_pos.z * dist_pos.z)
+	var target_velocity := target.velocity
 	
 	# If very close to origin and target is not moving, snap camera to target
-	if distance < _origin_tolerance && target_velocity == Vector3(0, 0, 0):
+	if distance < _origin_tolerance and target_velocity == Vector3(0, 0, 0):
 		global_position.x = tpos.x
 		global_position.z = tpos.z
 	elif distance != 0:
@@ -50,20 +50,20 @@ func _process(delta: float) -> void:
 				# Distance = speed * time
 				var camera_follow_dist = follow_speed * _target_speed * delta
 				# Check target's direction and camera's proximity to it
-				if target_velocity.x > 0 && global_position.x < tpos.x:
+				if target_velocity.x > 0 and global_position.x < tpos.x:
 					global_position.x += camera_follow_dist
-				elif target_velocity.x < 0 && tpos.x < global_position.x:
+				elif target_velocity.x < 0 and tpos.x < global_position.x:
 					global_position.x -= camera_follow_dist
 					
-				if target_velocity.z < 0 && global_position.z > tpos.z:
+				if target_velocity.z < 0 and global_position.z > tpos.z:
 					global_position.z -= camera_follow_dist
-				elif target_velocity.z > 0 && tpos.z > global_position.z:
+				elif target_velocity.z > 0 and tpos.z > global_position.z:
 					global_position.z += camera_follow_dist
 					
 		# Catchup to target
-		if target_velocity == Vector3(0, 0, 0) && tpos != global_position:
+		if target_velocity == Vector3(0, 0, 0) and tpos != global_position:
 			var camera_catchup_dist = catchup_speed * _target_speed * delta
-			# Check where camera has to catchip to
+			# Check where camera has to catchup to
 			if global_position.x < tpos.x:
 				global_position.x += camera_catchup_dist
 			elif tpos.x < global_position.x:
@@ -104,6 +104,6 @@ func draw_logic() -> void:
 	mesh_instance.global_transform = Transform3D.IDENTITY
 	mesh_instance.global_position = Vector3(global_position.x, target.global_position.y, global_position.z)
 	
-	#mesh is freed after one update of _process
+	# Mesh is freed after one update of _process
 	await get_tree().process_frame
 	mesh_instance.queue_free()

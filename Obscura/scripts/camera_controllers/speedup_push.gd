@@ -1,11 +1,12 @@
 class_name SpeedupPush
 extends CameraControllerBase
 
+
 @export var push_ratio:float = 0.4
-@export var pushbox_top_left:Vector2 = Vector2(-10, 7)
-@export var pushbox_bottom_right:Vector2 = Vector2(10, -7)
-@export var speedup_zone_top_left:Vector2 = Vector2(-4, 3)
-@export var speedup_zone_bottom_right:Vector2 = Vector2(4, -3)
+@export var pushbox_top_left:Vector2 = Vector2(-10.0, 7.0)
+@export var pushbox_bottom_right:Vector2 = Vector2(10.0, -7.0)
+@export var speedup_zone_top_left:Vector2 = Vector2(-4.0, 3.0)
+@export var speedup_zone_bottom_right:Vector2 = Vector2(4.0, -3.0)
 
 
 func _ready() -> void:
@@ -14,36 +15,44 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
-	if !current:
+	if not current:
 		return
 	
 	if draw_camera_logic:
 		draw_logic()
 		
-	var tpos = target.global_position
-	var cpos = global_position
+	var tpos := target.global_position
+	var cpos := global_position
 	
 	# Check horizontal direction
-	if (tpos.x < cpos.x + speedup_zone_top_left.x - target.WIDTH / 2.0 \
-	&& target.velocity.x < 0) \
-	|| (tpos.x > cpos.x + speedup_zone_bottom_right.x + target.WIDTH / 2.0 \
-	&& target.velocity.x > 0):
+	if (
+			(tpos.x < cpos.x + speedup_zone_top_left.x - target.WIDTH / 2.0
+			and target.velocity.x < 0)
+			or (tpos.x > cpos.x + speedup_zone_bottom_right.x + target.WIDTH / 2.0
+			and target.velocity.x > 0)
+	):
 		# Full speed
-		if tpos.x < cpos.x + pushbox_top_left.x - target.WIDTH / 2.0 \
-		|| tpos.x > cpos.x + pushbox_bottom_right.x + target.WIDTH / 2.0:
+		if (
+				tpos.x < cpos.x + pushbox_top_left.x - target.WIDTH / 2.0
+				or tpos.x > cpos.x + pushbox_bottom_right.x + target.WIDTH / 2.0
+		):
 			global_position.x += target.velocity.x * delta
 		else:
 			# Speed ratio
 			global_position.x += target.velocity.x * push_ratio * delta
 		
 	# Check vertical directions
-	if (tpos.z < cpos.z - speedup_zone_top_left.y - target.HEIGHT / 2.0 \
-	 && target.velocity.z < 0) \
-	 || (tpos.z > cpos.z - speedup_zone_bottom_right.y + target.HEIGHT / 2.0 \
-	 && target.velocity.z > 0):
+	if (
+			(tpos.z < cpos.z - speedup_zone_top_left.y - target.HEIGHT / 2.0
+			and target.velocity.z < 0)
+			or (tpos.z > cpos.z - speedup_zone_bottom_right.y + target.HEIGHT / 2.0
+			and target.velocity.z > 0)
+	): 
 		# Full speed
-		if tpos.z < cpos.z - pushbox_top_left.y - target.HEIGHT / 2.0 \
-		|| tpos.z > cpos.z - pushbox_bottom_right.y + target.HEIGHT / 2.0:
+		if (
+				tpos.z < cpos.z - pushbox_top_left.y - target.HEIGHT / 2.0
+				or tpos.z > cpos.z - pushbox_bottom_right.y + target.HEIGHT / 2.0
+		):
 			global_position.z += target.velocity.z * delta
 		else:
 			# Speed ratio
@@ -71,6 +80,7 @@ func draw_logic() -> void:
 	
 	immediate_mesh.surface_begin(Mesh.PRIMITIVE_LINES, material)
 	
+	# Pushbox drawn
 	immediate_mesh.surface_add_vertex(Vector3(pushbox_right, 0, pushbox_top))
 	immediate_mesh.surface_add_vertex(Vector3(pushbox_right, 0, pushbox_bottom))
 	immediate_mesh.surface_add_vertex(Vector3(pushbox_right, 0, pushbox_bottom))
@@ -79,7 +89,7 @@ func draw_logic() -> void:
 	immediate_mesh.surface_add_vertex(Vector3(pushbox_left, 0, pushbox_top))
 	immediate_mesh.surface_add_vertex(Vector3(pushbox_left, 0, pushbox_top))
 	immediate_mesh.surface_add_vertex(Vector3(pushbox_right, 0, pushbox_top))
-	
+	# Speedup zone drawn
 	immediate_mesh.surface_add_vertex(Vector3(speedup_zone_right, 0, speedup_zone_top))
 	immediate_mesh.surface_add_vertex(Vector3(speedup_zone_right, 0, speedup_zone_bottom))
 	immediate_mesh.surface_add_vertex(Vector3(speedup_zone_right, 0, speedup_zone_bottom))
@@ -98,6 +108,6 @@ func draw_logic() -> void:
 	mesh_instance.global_transform = Transform3D.IDENTITY
 	mesh_instance.global_position = Vector3(global_position.x, target.global_position.y, global_position.z)
 	
-	#mesh is freed after one update of _process
+	# Mesh is freed after one update of _process
 	await get_tree().process_frame
 	mesh_instance.queue_free()

@@ -14,7 +14,6 @@ func _ready():
 
 
 func _process(_delta):
-
 	if Input.is_action_just_pressed("cycle_camera_controller"):
 		current_controller += 1
 		if len(cameras) < current_controller+1:
@@ -22,7 +21,7 @@ func _process(_delta):
 			
 		# Always draw logic when switching cameras
 		cameras[current_controller].draw_camera_logic = true
-		# Reset camera between functions
+		# Reset camera to center of target between functions
 		cameras[current_controller].reset_camera_position()
 		
 		for index in len(cameras):

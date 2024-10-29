@@ -8,13 +8,13 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
-	if !current:
+	if not current:
 		return
 	
 	if draw_camera_logic:
 		draw_logic()
 		
-	var tpos = target.global_position
+	var tpos := target.global_position
 	global_position.x = tpos.x
 	global_position.z = tpos.z
 	
@@ -49,6 +49,6 @@ func draw_logic() -> void:
 	mesh_instance.global_transform = Transform3D.IDENTITY
 	mesh_instance.global_position = Vector3(global_position.x, target.global_position.y, global_position.z)
 	
-	#mesh is freed after one update of _process
+	# Mesh is freed after one update of _process
 	await get_tree().process_frame
 	mesh_instance.queue_free()

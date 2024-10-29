@@ -45,7 +45,7 @@ func _process(delta: float) -> void:
 
 func draw_logic() -> void:
 	pass
-	
+
 
 func reset_camera_position() -> void:
 	global_position.x = target.global_position.x

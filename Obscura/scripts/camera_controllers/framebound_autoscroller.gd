@@ -2,8 +2,8 @@ class_name FrameboundAutoscroller
 extends CameraControllerBase
 
 
-@export var top_left:Vector2 = Vector2(-12, 6)
-@export var bottom_right:Vector2 = Vector2(12, -6)
+@export var top_left:Vector2 = Vector2(-12.0, 6.0)
+@export var bottom_right:Vector2 = Vector2(12.0, -6.0)
 @export var autoscroll_speed:Vector3 = Vector3(20.0, 0, 0)
 
 
@@ -13,36 +13,36 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
-	if !current:
+	if not current:
 		return
 	
 	if draw_camera_logic:
 		draw_logic()
 		
-	# autoscroll camera + player
+	# Autoscroll camera + player
 	global_position.x += autoscroll_speed.x * delta
 	global_position.z += autoscroll_speed.z * delta
 	target.global_position.x += autoscroll_speed.x * delta
 	target.global_position.z += autoscroll_speed.z * delta
 	
-	var tpos = target.global_position
-	var cpos = global_position
+	var tpos := target.global_position
+	var cpos := global_position
 	
-	# make player stay within boundaries
-	#left
-	var diff_between_left_edges = (tpos.x - target.WIDTH / 2.0) - (cpos.x + top_left.x)
+	# Make player stay within boundaries
+	# Left
+	var diff_between_left_edges := (tpos.x - target.WIDTH / 2.0) - (cpos.x + top_left.x)
 	if diff_between_left_edges < 0:
 		target.global_position.x -= diff_between_left_edges
-	#right
-	var diff_between_right_edges = (tpos.x + target.WIDTH / 2.0) - (cpos.x + bottom_right.x)
+	# Right
+	var diff_between_right_edges:= (tpos.x + target.WIDTH / 2.0) - (cpos.x + bottom_right.x)
 	if diff_between_right_edges > 0:
 		target.global_position.x -= diff_between_right_edges
-	#top
-	var diff_between_top_edges = (tpos.z + target.HEIGHT / 2.0) - (cpos.z + top_left.y)
+	# Top
+	var diff_between_top_edges := (tpos.z + target.HEIGHT / 2.0) - (cpos.z + top_left.y)
 	if diff_between_top_edges > 0:
 		target.global_position.z -= diff_between_top_edges
-	#bottom
-	var diff_between_bottom_edges = (tpos.z - target.HEIGHT / 2.0) - (cpos.z + bottom_right.y)
+	# Bottom
+	var diff_between_bottom_edges := (tpos.z - target.HEIGHT / 2.0) - (cpos.z + bottom_right.y)
 	if diff_between_bottom_edges < 0:
 		target.global_position.z -= diff_between_bottom_edges
 	
@@ -83,6 +83,6 @@ func draw_logic() -> void:
 	mesh_instance.global_transform = Transform3D.IDENTITY
 	mesh_instance.global_position = Vector3(global_position.x, target.global_position.y, global_position.z)
 	
-	#mesh is freed after one update of _process
+	# Mesh is freed after one update of _process
 	await get_tree().process_frame
 	mesh_instance.queue_free()

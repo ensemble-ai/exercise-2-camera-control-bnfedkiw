@@ -6,7 +6,7 @@ const SPEED_UP_CAMERA:float = 1.5
 # Make speeds be a ratio of player speed
 # Add 1 to lead speed to make it faster than the player
 @export var lead_speed:float = 1.60
-@export var catchup_delay_duration:float = 1.0
+@export var catchup_delay_duration:float = 0.7
 @export var catchup_speed:float = 0.7
 @export var leash_distance:float = 6.0
 
@@ -45,7 +45,7 @@ func _process(delta: float) -> void:
 		global_position.z = tpos.z
 		distance = 0
 		_timer = null
-	if distance != 0:
+	elif distance != 0:
 		if distance > leash_distance:
 			# Stop camera from getting too far from player
 			# If camera is behind player, speed it up to get ahead
@@ -64,11 +64,10 @@ func _process(delta: float) -> void:
 			else:
 				global_position.z += target.velocity.z * delta
 		else:
-			# Distance = speed * time, use of follow and catchup speed as a ratio
-			var camera_lead_dist = lead_speed * _target_speed * delta
 			# Follow target
+			# Check target's direction and camera's proximity to it
+			var camera_lead_dist = lead_speed * _target_speed * delta
 			if target_velocity != Vector3(0, 0, 0):
-				# Check target's direction and camera's proximity to it
 				if target_velocity.x > 0:
 					global_position.x += camera_lead_dist
 				elif target_velocity.x < 0:
@@ -86,7 +85,8 @@ func _process(delta: float) -> void:
 				add_child(_timer)
 				_timer.one_shot = true
 				_timer.start(catchup_delay_duration)
-			elif _timer.is_stopped():
+			
+			if _timer.is_stopped():
 				var camera_catchup_dist = catchup_speed * _target_speed * delta
 				# Check where camera has to catchup to
 				if global_position.x < tpos.x:
@@ -98,6 +98,13 @@ func _process(delta: float) -> void:
 					global_position.z += camera_catchup_dist
 				elif tpos.z < global_position.z:
 					global_position.z -= camera_catchup_dist
+				
+	# If catchup is in progress, see if target started moving before it finished
+	# If target is moving, reset timer
+	if _timer != null:
+		if _timer.is_stopped() && (target.velocity.x != 0 || target.velocity.z != 0):
+			_timer = null
+			
 	super(delta)
 	
 

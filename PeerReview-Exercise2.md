@@ -74,7 +74,7 @@ ___
 ___
 #### Justification ##### 
 Write Justification here.
-
+https://github.com/ensemble-ai/exercise-2-camera-control-bnfedkiw/blob/4fbf3c76c7339b6619d62295bae485c5c42fe93a/Obscura/scripts/camera_controllers/framebound_autoscroller.gd#L25
 ___
 ### Stage 3 ###
 

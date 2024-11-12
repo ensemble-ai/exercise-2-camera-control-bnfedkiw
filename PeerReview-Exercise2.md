@@ -75,6 +75,7 @@ ___
 The framing with horizontal auto-scroll camera works good. However, the player pushing forward by the box edge didn't shown,
 since the player will move horizontally as same as auto-scroll camera.
 These [lines](https://github.com/ensemble-ai/exercise-2-camera-control-bnfedkiw/blob/b4a3545f87860490d94bf64783de96d0ff92422a/Obscura/scripts/camera_controllers/framebound_autoscroller.gd#L25C1-L26C56) will set the player and the camera always move at the same velocity, so it can't test whether the player is pushed by the box edge.
+After I comment these 2 lines the player is pushed by the box edge fine.
 ___
 ### Stage 3 ###
 
@@ -89,7 +90,7 @@ ___
 Position lock and lerp lock camera works good.
 The camera follow the player that slower than player.
 And when I stop moving the camera will catch up the player.
-The distance between the player and camera also not excced the leash distance. When I speed up player, it will always keep a certain distance.
+The distance between the player and camera also not excced the leash distance. When I speed up player, it will still keep a certain distance.
 ___
 ### Stage 4 ###
 

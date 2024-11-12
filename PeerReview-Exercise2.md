@@ -60,27 +60,25 @@ ___
 
 ___
 #### Justification ##### 
-Write Justification here.
 Position lock camera works as expected. The controller draw a 5 by 5 unit cross in the center of the screen.
 ___
 ### Stage 2 ###
 
 - [ ] Perfect
 - [ ] Great
-- [ ] Good
+- [x] Good
 - [ ] Satisfactory
 - [ ] Unsatisfactory
 
 ___
 #### Justification ##### 
-Write Justification here.
-The framing with horizontal auto-scroll camera works as expected. However, the player pushing forward by the box edge didn't shown,
+The framing with horizontal auto-scroll camera works good. However, the player pushing forward by the box edge didn't shown,
 since the player will move horizontally as same as auto-scroll camera.
 These [lines](https://github.com/ensemble-ai/exercise-2-camera-control-bnfedkiw/blob/b4a3545f87860490d94bf64783de96d0ff92422a/Obscura/scripts/camera_controllers/framebound_autoscroller.gd#L25C1-L26C56) will set the player and the camera always move at the same velocity, so it can't test whether the player is pushed by the box edge.
 ___
 ### Stage 3 ###
 
-- [ ] Perfect
+- [x] Perfect
 - [ ] Great
 - [ ] Good
 - [ ] Satisfactory
@@ -88,12 +86,14 @@ ___
 
 ___
 #### Justification ##### 
-Write Justification here.
-
+Position lock and lerp lock camera works good.
+The camera follow the player that slower than player.
+And when I stop moving the camera will catch up the player.
+The distance between the player and camera also not excced the leash distance. When I speed up player, it will always keep a certain distance.
 ___
 ### Stage 4 ###
 
-- [ ] Perfect
+- [x] Perfect
 - [ ] Great
 - [ ] Good
 - [ ] Satisfactory
@@ -101,20 +101,24 @@ ___
 
 ___
 #### Justification ##### 
-Write Justification here.
-
+Lerp target focus camera works as expect.
+The positon of camera lead the player in the direction of input as expect. It has a maximum distance between the player and camera. And when there are no movement input, the camera will be settled on the player after the cathup delay duration. 
 ___
 ### Stage 5 ###
 
 - [ ] Perfect
-- [ ] Great
+- [x] Great
 - [ ] Good
 - [ ] Satisfactory
 - [ ] Unsatisfactory
 
 ___
 #### Justification ##### 
-Write Justification here.
+4-way sppedup push zone camera works good.
+In the inner area, the camera will not moving.
+The camera move at palyer moverment spped when player touch side of the border box. 
+The camera will move at the speed of the ratio when the palyer between the speedup zone and push box border. However, the speed is set too slow, so no matter how the camera moves in this area, the
+camera don't very obvious movement and hit the boarder box, only slight movement show that the player is in this speedup area.
 ___
 # Code Style #
 
@@ -132,9 +136,21 @@ Please refer to the first code review template on how to do a permalink.
 
 
 #### Style Guide Infractions ####
+[variable type](https://github.com/ensemble-ai/exercise-2-camera-control-bnfedkiw/blob/bb65b749d40d90740de61096c7e497faa403856d/Obscura/scripts/camera_controllers/position_lock.gd#L17) using : but not delcare the variable type of tpos.
+
+[global variable](https://github.com/ensemble-ai/exercise-2-camera-control-bnfedkiw/blob/bb65b749d40d90740de61096c7e497faa403856d/Obscura/scripts/camera_controllers/lerp_target.gd#L13)
+Delcare variable in LerpTarget class but the variable only use in _process function. Put it in _process function would be better.
+
+[global variable](https://github.com/ensemble-ai/exercise-2-camera-control-bnfedkiw/blob/bb65b749d40d90740de61096c7e497faa403856d/Obscura/scripts/camera_controllers/position_lerp.gd#L10C1-L12C1)
+Declare variable in positionLerp calls but only use in _process function. Set to local variable would be better.
 
 #### Style Guide Exemplars ####
 
+[clear local variable delcare](https://github.com/ensemble-ai/exercise-2-camera-control-bnfedkiw/blob/bb65b749d40d90740de61096c7e497faa403856d/Obscura/scripts/camera_controllers/speedup_push.gd#L72C1-L79C61)
+: clear variable names, easy to read and understand.
+
+[clear code style on long if statement](https://github.com/ensemble-ai/exercise-2-camera-control-bnfedkiw/blob/bb65b749d40d90740de61096c7e497faa403856d/Obscura/scripts/camera_controllers/lerp_target.gd#L52C3-L55C6)
+: clear coding style increases readability when there are many conditions in if statement
 ___
 #### Put style guide infractures ####
 
@@ -153,4 +169,21 @@ This should be similar to the Code Style justification.
 
 #### Best Practices Infractions ####
 
+[auto scroll camera](https://github.com/ensemble-ai/exercise-2-camera-control-bnfedkiw/blob/b4a3545f87860490d94bf64783de96d0ff92422a/Obscura/scripts/camera_controllers/framebound_autoscroller.gd#L25C1-L26C56)
+: these two lines set the player and the camera always both move in the same velocity, the palyer and camera will be position lock. So it hard to test whether the player is pushed by the box edge.
+
+[speed setting in speedup zone](https://github.com/ensemble-ai/exercise-2-camera-control-bnfedkiw/blob/bb65b749d40d90740de61096c7e497faa403856d/Obscura/scripts/camera_controllers/speedup_push.gd#L5C1-L9C67). 
+: Since this camera is slight slow in spped-up, no matter how the camera moves in this area, the camera did't show an obvious movement.
+change the speed ratio or change the space between pushbox and speedupzone to make the space larger would be slove the problem. 
+So changing the initial exported variables will be fine.
+___
+
 #### Best Practices Exemplars ####
+[exported variable](https://github.com/ensemble-ai/exercise-2-camera-control-bnfedkiw/blob/bb65b749d40d90740de61096c7e497faa403856d/Obscura/scripts/camera_controllers/framebound_autoscroller.gd#L5)
+: Well-placed exported variable and correct vector of top_left and bot_right for the boundaries to ensure the player stays within boundaries
+
+[Deciding speed ratio](https://github.com/ensemble-ai/exercise-2-camera-control-bnfedkiw/blob/bb65b749d40d90740de61096c7e497faa403856d/Obscura/scripts/camera_controllers/lerp_target.gd#L31C1-L35C2)
+: Good implemented for choosing the speed to take a ratio off
+
+[clear boundaries setting](https://github.com/ensemble-ai/exercise-2-camera-control-bnfedkiw/blob/bb65b749d40d90740de61096c7e497faa403856d/Obscura/scripts/camera_controllers/framebound_autoscroller.gd#L33C2-L47C56)
+: clear implemented for the boundary of the player

@@ -77,7 +77,7 @@ Write Justification here.
 The framing with horizontal auto-scroll camera works as expected. However, the player pushing forward by the box edge didn't shown,
 since the player will move horizontally as same as auto-scroll camera.
 
-https://github.com/ensemble-ai/exercise-2-camera-control-bnfedkiw/blob/b4a3545f87860490d94bf64783de96d0ff92422a/Obscura/scripts/camera_controllers/framebound_autoscroller.gd#L25C1-L26C56
+https://github.com/ensemble-ai/exercise-2-camera-control-bnfedkiw/blob/2bafc735d25595c4e3e2b2071e9f33c325427933/Obscura/scripts/camera_controllers/framebound_autoscroller.gd#L25C1-L26C56
 
 These lines will make the player and the camera always move at the same velocity, so it can't test whether the player is pushed by the box edge.
 ___
